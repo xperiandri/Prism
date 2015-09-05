@@ -25,6 +25,14 @@ namespace Prism.Unity.Windows
 
         public PrismUnityApplication()
         {
+            Logger = CreateLogger();
+            if (Logger == null)
+            {
+                throw new InvalidOperationException("Logger Facade is null");
+            }
+
+            Logger.Log("Created Logger", Category.Debug, Priority.Low);
+
             Container = CreateContainer();
             if (Container == null)
             {
@@ -67,17 +75,34 @@ namespace Prism.Unity.Windows
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>A concrete instance of the specified type.</returns>
-        protected override sealed object Resolve(Type type) => Container.Resolve(type);
+        protected override sealed object Resolve(Type type)
+        {
+            return Container.Resolve(type);
+        }
 
         #endregion Overrides
 
         #region Protected Methods
 
         /// <summary>
+        /// Create the <see cref="ILoggerFacade" /> used by the bootstrapper.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation returns a new DebugLogger.
+        /// </remarks>
+        protected virtual ILoggerFacade CreateLogger()
+        {
+            return new DebugLogger();
+        }
+
+        /// <summary>
         /// Creates the <see cref="IUnityContainer"/> that will be used as the default container.
         /// </summary>
         /// <returns>A new instance of <see cref="IUnityContainer"/>.</returns>
-        protected virtual IUnityContainer CreateContainer() => new UnityContainer();
+        protected virtual IUnityContainer CreateContainer()
+        {
+            return new UnityContainer();
+        }
 
         /// <summary>
         /// Configures the <see cref="ViewModelLocator"/> used by Prism.

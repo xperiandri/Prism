@@ -49,7 +49,7 @@ namespace Prism.Windows.Validation
         {
             if (entityToValidate == null)
             {
-                throw new ArgumentNullException("entityToValidate");
+                throw new ArgumentNullException(nameof(entityToValidate));
             }
 
             _entityToValidate = entityToValidate;
@@ -104,7 +104,7 @@ namespace Prism.Windows.Validation
         /// Returns a new ReadOnlyDictionary containing all the errors of the Entity, separated by property.
         /// </summary>
         /// <returns>
-        /// A ReadOnlyDictionary that contains a KeyValuePair for each property with errors. 
+        /// A ReadOnlyDictionary that contains a KeyValuePair for each property with errors.
         /// Each KeyValuePair has a property name as the key, and the value is the collection of errors of that property.
         /// </returns>
         public ReadOnlyDictionary<string, ReadOnlyCollection<string>> GetAllErrors()
@@ -120,7 +120,7 @@ namespace Prism.Windows.Validation
         {
             if (entityErrors == null)
             {
-                throw new ArgumentNullException("entityErrors");
+                throw new ArgumentNullException(nameof(entityErrors));
             }
 
             _errors.Clear();
@@ -135,8 +135,8 @@ namespace Prism.Windows.Validation
         }
 
         /// <summary>
-        /// Validates the property, based on the rules set in the property ValidationAttributes attributes. 
-        /// It updates the errors collection with the new validation results (notifying if necessary). 
+        /// Validates the property, based on the rules set in the property ValidationAttributes attributes.
+        /// It updates the errors collection with the new validation results (notifying if necessary).
         /// </summary>
         /// <param name="propertyName">The name of the property to validate.</param>
         /// <returns>True if the property is valid. Otherwise, false.</returns>
@@ -146,7 +146,7 @@ namespace Prism.Windows.Validation
         {
             if (string.IsNullOrEmpty(propertyName))
             {
-                throw new ArgumentNullException("propertyName");
+                throw new ArgumentNullException(nameof(propertyName));
             }
 
             var propertyInfo = _entityToValidate.GetType().GetRuntimeProperty(propertyName);
@@ -172,7 +172,7 @@ namespace Prism.Windows.Validation
 
         /// <summary>
         /// Validates all the properties decorated with the ValidationAttribute attribute.
-        /// It updates each property errors collection with the new validation results (notifying if necessary). 
+        /// It updates each property errors collection with the new validation results (notifying if necessary).
         /// </summary>
         /// <returns>True if the property is valid. Otherwise, false.</returns>
         public bool ValidateProperties()
@@ -197,7 +197,7 @@ namespace Prism.Windows.Validation
                 }
             }
 
-            // Notify each property whose set of errors has changed since the last validation.  
+            // Notify each property whose set of errors has changed since the last validation.
             foreach (string propertyName in propertiesWithChangedErrors)
             {
                 OnErrorsChanged(propertyName);
@@ -208,7 +208,7 @@ namespace Prism.Windows.Validation
         }
 
         /// <summary>
-        /// Performs a validation of a property, adding the results in the propertyErrors list. 
+        /// Performs a validation of a property, adding the results in the propertyErrors list.
         /// </summary>
         /// <param name="propertyInfo">The PropertyInfo of the property to validate</param>
         /// <param name="propertyErrors">A list containing the current error messages of the property.</param>
@@ -243,7 +243,7 @@ namespace Prism.Windows.Validation
             // If the property does not have errors, simply add them
             if (!_errors.ContainsKey(propertyName))
             {
-                if (propertyNewErrors.Count > 0)
+                if (propertyNewErrors.Any())
                 {
                     _errors.Add(propertyName, new ReadOnlyCollection<string>(propertyNewErrors));
                     errorsChanged = true;
@@ -255,7 +255,7 @@ namespace Prism.Windows.Validation
                 // If the number of errors is the same, check if there are new ones
                 if (propertyNewErrors.Count != _errors[propertyName].Count || _errors[propertyName].Intersect(propertyNewErrors).Count() != propertyNewErrors.Count())
                 {
-                    if (propertyNewErrors.Count > 0)
+                    if (propertyNewErrors.Any())
                     {
                         _errors[propertyName] = new ReadOnlyCollection<string>(propertyNewErrors);
                     }

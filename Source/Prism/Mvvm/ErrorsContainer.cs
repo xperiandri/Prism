@@ -28,7 +28,7 @@ namespace Prism.Mvvm
         {
             if (raiseErrorsChanged == null)
             {
-                throw new ArgumentNullException("raiseErrorsChanged");
+                throw new ArgumentNullException(nameof(raiseErrorsChanged));
             }
 
             this.raiseErrorsChanged = raiseErrorsChanged;
@@ -38,13 +38,7 @@ namespace Prism.Mvvm
         /// <summary>
         /// Gets a value indicating whether the object has validation errors. 
         /// </summary>
-        public bool HasErrors
-        {
-            get
-            {
-                return this.validationResults.Count != 0;
-            }
-        }
+        public bool HasErrors => this.validationResults.Count != 0;
 
         /// <summary>
         /// Gets the validation errors for a specified property.

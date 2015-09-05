@@ -174,7 +174,7 @@ namespace Prism.Windows.AppModel
         /// store navigation-related information.</param>
         public void RegisterFrame(IFrameFacade frame, String sessionStateKey)
         {
-            if (frame == null) throw new ArgumentNullException("frame");
+            if (frame == null) throw new ArgumentNullException(nameof(frame));
 
             var resourceLoader = ResourceLoader.GetForCurrentView(Constants.InfrastructureResourceMapId);
 
@@ -233,7 +233,7 @@ namespace Prism.Windows.AppModel
         /// <see cref="SessionState"/>.</returns>
         public Dictionary<String, Object> GetSessionStateForFrame(IFrameFacade frame)
         {
-            if (frame == null) throw new ArgumentNullException("frame");
+            if (frame == null) throw new ArgumentNullException(nameof(frame));
 
             var frameState = (Dictionary<String, Object>)frame.GetValue(FrameSessionStateProperty);
 

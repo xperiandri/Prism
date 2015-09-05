@@ -20,27 +20,5 @@ namespace Prism.Tests.Mocks.Commands
         {
 
         }
-
-        public static DelegateCommandMock FromAsyncHandler(Func<object, Task> executeMethod)
-        {
-            return new DelegateCommandMock(executeMethod);
-        }
-
-        public static DelegateCommandMock FromAsyncHandler(Func<object, Task> executeMethod, Func<object, bool> canExecuteMethod)
-        {
-            return new DelegateCommandMock(executeMethod, canExecuteMethod);
-        }
-
-        private DelegateCommandMock(Func<object, Task> executeMethod) :
-            base(executeMethod, (o) => true)
-        {
-
-        }
-
-        private DelegateCommandMock(Func<object, Task> executeMethod, Func<object, bool> canExecuteMethod) :
-            base(executeMethod, canExecuteMethod)
-        {
-
-        }
     }
 }

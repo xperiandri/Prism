@@ -1,9 +1,8 @@
+using Prism.Properties;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Prism.Properties;
 
 namespace Prism.Commands
 {
@@ -23,7 +22,7 @@ namespace Prism.Commands
     /// {
     ///     this.submitCommand = new DelegateCommand&lt;int?&gt;(this.Submit, this.CanSubmit);
     /// }
-    /// 
+    ///
     /// private bool CanSubmit(int? customerId)
     /// {
     ///     return (customerId.HasValue &amp;&amp; customers.Contains(customerId.Value));
@@ -52,12 +51,14 @@ namespace Prism.Commands
         public DelegateCommand(Action<T> executeMethod, Func<T, bool> canExecuteMethod)
             : base((o) => executeMethod((T)o), (o) => canExecuteMethod((T)o))
         {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
+            if (executeMethod == null)
+                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
+            if (canExecuteMethod == null)
+                throw new ArgumentNullException(nameof(canExecuteMethod), Resources.DelegateCommandDelegatesCannotBeNull);
 
             TypeInfo genericTypeInfo = typeof(T).GetTypeInfo();
 
-            // DelegateCommand allows object or Nullable<>.  
+            // DelegateCommand allows object or Nullable<>.
             // note: Nullable<> is a struct so we cannot use a class constraint.
             if (genericTypeInfo.IsValueType)
             {
@@ -66,7 +67,6 @@ namespace Prism.Commands
                     throw new InvalidCastException(Resources.DelegateCommandInvalidGenericPayloadType);
                 }
             }
-
         }
 
         /// <summary>
@@ -92,27 +92,6 @@ namespace Prism.Commands
             return this;
         }
 
-        /// <summary>
-        /// Factory method to create a new instance of <see cref="DelegateCommand{T}"/> from an awaitable handler method.
-        /// </summary>
-        /// <param name="executeMethod">Delegate to execute when Execute is called on the command.</param>
-        /// <returns>Constructed instance of <see cref="DelegateCommand{T}"/></returns>
-        public static DelegateCommand<T> FromAsyncHandler(Func<T, Task> executeMethod)
-        {
-            return new DelegateCommand<T>(executeMethod);
-        }
-
-        /// <summary>
-        /// Factory method to create a new instance of <see cref="DelegateCommand{T}"/> from an awaitable handler method.
-        /// </summary>
-        /// <param name="executeMethod">Delegate to execute when Execute is called on the command. This can be null to just hook up a CanExecute delegate.</param>
-        /// <param name="canExecuteMethod">Delegate to execute when CanExecute is called on the command. This can be null.</param>
-        /// <returns>Constructed instance of <see cref="DelegateCommand{T}"/></returns>
-        public static DelegateCommand<T> FromAsyncHandler(Func<T, Task> executeMethod, Func<T, bool> canExecuteMethod)
-        {
-            return new DelegateCommand<T>(executeMethod, canExecuteMethod);
-        }
-
         ///<summary>
         ///Determines if the command can execute by invoked the <see cref="Func{T,Bool}"/> provided during construction.
         ///</summary>
@@ -120,33 +99,16 @@ namespace Prism.Commands
         ///<returns>
         ///<see langword="true" /> if this command can be executed; otherwise, <see langword="false" />.
         ///</returns>
-        public virtual bool CanExecute(T parameter)
-        {
-            return base.CanExecute(parameter);
-        }
+        public virtual bool CanExecute(T parameter) => base.CanExecute(parameter);
 
         ///<summary>
         ///Executes the command and invokes the <see cref="Action{T}"/> provided during construction.
         ///</summary>
         ///<param name="parameter">Data used by the command.</param>
-        public virtual async Task Execute(T parameter)
+        public virtual void Execute(T parameter)
         {
-            await base.Execute(parameter);
+            base.Execute(parameter);
         }
-
-
-        private DelegateCommand(Func<T, Task> executeMethod)
-            : this(executeMethod, (o) => true)
-        {
-        }
-
-        private DelegateCommand(Func<T, Task> executeMethod, Func<T, bool> canExecuteMethod)
-            : base((o) => executeMethod((T)o), (o) => canExecuteMethod((T)o))
-        {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
-        }
-
     }
 
     /// <summary>
@@ -174,8 +136,10 @@ namespace Prism.Commands
         public DelegateCommand(Action executeMethod, Func<bool> canExecuteMethod)
             : base((o) => executeMethod(), (o) => canExecuteMethod())
         {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
+            if (executeMethod == null)
+                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
+            if (canExecuteMethod == null)
+                throw new ArgumentNullException(nameof(canExecuteMethod), Resources.DelegateCommandDelegatesCannotBeNull);
         }
 
         /// <summary>
@@ -201,55 +165,18 @@ namespace Prism.Commands
             return this;
         }
 
-        /// <summary>
-        /// Factory method to create a new instance of <see cref="DelegateCommand"/> from an awaitable handler method.
-        /// </summary>
-        /// <param name="executeMethod">Delegate to execute when Execute is called on the command.</param>
-        /// <returns>Constructed instance of <see cref="DelegateCommand"/></returns>
-        public static DelegateCommand FromAsyncHandler(Func<Task> executeMethod)
-        {
-            return new DelegateCommand(executeMethod);
-        }
-
-        /// <summary>
-        /// Factory method to create a new instance of <see cref="DelegateCommand"/> from an awaitable handler method.
-        /// </summary>
-        /// <param name="executeMethod">Delegate to execute when Execute is called on the command. This can be null to just hook up a CanExecute delegate.</param>
-        /// <param name="canExecuteMethod">Delegate to execute when CanExecute is called on the command. This can be null.</param>
-        /// <returns>Constructed instance of <see cref="DelegateCommand"/></returns>
-        public static DelegateCommand FromAsyncHandler(Func<Task> executeMethod, Func<bool> canExecuteMethod)
-        {
-            return new DelegateCommand(executeMethod, canExecuteMethod);
-        }
-
         ///<summary>
         /// Executes the command.
         ///</summary>
-        public virtual async Task Execute()
+        public virtual void Execute()
         {
-            await Execute(null);
+            Execute(null);
         }
 
         /// <summary>
         /// Determines if the command can be executed.
         /// </summary>
         /// <returns>Returns <see langword="true"/> if the command can execute, otherwise returns <see langword="false"/>.</returns>
-        public virtual bool CanExecute()
-        {
-            return CanExecute(null);
-        }
-
-        private DelegateCommand(Func<Task> executeMethod)
-            : this(executeMethod, () => true)
-        {
-        }
-
-        private DelegateCommand(Func<Task> executeMethod, Func<bool> canExecuteMethod)
-            : base((o) => executeMethod(), (o) => canExecuteMethod())
-        {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
-        }
+        public virtual bool CanExecute() => CanExecute(null);
     }
-
 }

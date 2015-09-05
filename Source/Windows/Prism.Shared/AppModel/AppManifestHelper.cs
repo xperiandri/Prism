@@ -9,8 +9,13 @@ namespace Prism.Windows.AppModel
     /// </summary>
     public static class AppManifestHelper
     {
+#if WINDOWS_UWP
+        const string manifestNamespace = "http://schemas.microsoft.com/appx/manifest/foundation/windows10";
+#else
+        const string manifestNamespace = "http://schemas.microsoft.com/appx/2010/manifest";
+#endif
         private static readonly XDocument manifest = XDocument.Load("AppxManifest.xml", LoadOptions.None);
-        private static readonly XNamespace xNamespace = XNamespace.Get("http://schemas.microsoft.com/appx/manifest/foundation/windows10");
+        private static readonly XNamespace xNamespace = XNamespace.Get(manifestNamespace);
 
         /// <summary>
         /// Checks if the Search declaration was activated in the Package.appxmanifest.

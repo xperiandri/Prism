@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -89,10 +90,7 @@ namespace Prism.Windows.Navigation
         /// <returns>
         /// The number of entries in the navigation back stack.
         /// </returns>
-        public int BackStackDepth
-        {
-            get { return _frame.BackStackDepth; }
-        }
+        public int BackStackDepth => _frame.BackStackDepth;
 
         public IList<PageStackEntry> BackStack => _frame.BackStack;
 
@@ -103,10 +101,7 @@ namespace Prism.Windows.Navigation
         /// <returns>
         /// True if there is at least one entry in back navigation history; false if there are no entries in back navigation history or the Frame does not own its own navigation history.
         /// </returns>
-        public bool CanGoBack
-        {
-            get { return _frame.CanGoBack; }
-        }
+        public bool CanGoBack => _frame.CanGoBack;
 
         /// <summary>
         /// Goes to the next page in the navigation stack.
@@ -122,10 +117,7 @@ namespace Prism.Windows.Navigation
         /// <returns>
         ///   <c>true</c> if the navigation service can go forward; otherwise, <c>false</c>.
         /// </returns>
-        public bool CanGoForward()
-        {
-            return _frame.CanGoForward;
-        }
+        public bool CanGoForward() => _frame.CanGoForward;
 
         /// <summary>
         /// Occurs when the content that is being navigated to has been found and is available from the Content property, although it may not have completed loading.
@@ -191,10 +183,7 @@ namespace Prism.Windows.Navigation
         /// Returns the current effective value.
         /// </returns>
         /// <param name="dependencyProperty">The DependencyProperty identifier of the property for which to retrieve the value.</param>
-        public object GetValue(DependencyProperty dependencyProperty)
-        {
-            return _frame.GetValue(dependencyProperty);
-        }
+        public object GetValue(DependencyProperty dependencyProperty) => _frame.GetValue(dependencyProperty);
 
         /// <summary>
         /// Sets the local value of a dependency property on a DependencyObject.
@@ -216,7 +205,7 @@ namespace Prism.Windows.Navigation
 
         private void OnFrameNavigatedTo(object sender, NavigationEventArgs e)
         {
-            if (_navigatedToEventHandlers.Count > 0)
+            if (_navigatedToEventHandlers.Any())
             {
                 var args = new NavigatedToEventArgs(e);
 
@@ -227,7 +216,7 @@ namespace Prism.Windows.Navigation
 
         private void OnFrameNavigatingFrom(object sender, NavigatingCancelEventArgs e)
         {
-            if (_navigatingFromEventHandlers.Count > 0)
+            if (_navigatingFromEventHandlers.Any())
             {
                 var args = new NavigatingFromEventArgs(e);
 

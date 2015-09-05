@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>fc0a6a55-3e78-4ed5-9186-669a12f10dba</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Prism.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\AppManifestHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\DeviceGestureEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\IDeviceGestureService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\IResourceLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\ISessionStateService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\ResourceLoaderAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\RestorableStateAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppModel\SessionStateService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GlobalSuppressions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mvvm\ViewModelBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mvvm\ViewModelLocator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mvvm\VisualStateAwarePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\FrameFacadeAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\FrameNavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\IFrameFacade.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\INavigationAware.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\INavigationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\NavigatedToEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Navigation\NavigatingFromEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PrismApplication.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Validation\BindableValidator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Validation\IValidatableBindableBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Validation\ValidatableBindableBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />
+  </ItemGroup>
+</Project>

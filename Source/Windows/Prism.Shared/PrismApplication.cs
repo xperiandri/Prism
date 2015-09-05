@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading.Tasks;
+﻿using Prism.Logging;
 using Prism.Mvvm;
 using Prism.Windows.AppModel;
 using Prism.Windows.Mvvm;
+using Prism.Windows.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Resources;
@@ -12,21 +14,38 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Prism.Windows.Navigation;
 
 namespace Prism.Windows
 {
     public abstract class PrismApplication : Application
     {
-
         private bool _isRestoringFromTermination;
 
         /// <summary>
         /// Initializes the singleton application object. This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
-        protected PrismApplication()
+        public PrismApplication()
+            : this(new DebugLogger())
         {
+        }
+
+
+        /// <summary>
+        /// Initializes the singleton application object. This is the first line of authored code
+        /// executed, and as such is the logical equivalent of main() or WinMain().
+        /// </summary>
+        /// <param name="logger">Logger</param>
+        protected PrismApplication(ILoggerFacade logger)
+        {
+            Logger = logger;
+            if (Logger == null)
+            {
+                throw new InvalidOperationException("Logger Facade is null");
+            }
+
+            Logger.Log("Created Logger", Category.Debug, Priority.Low);
+
             this.Suspending += OnSuspending;
         }
 
@@ -78,10 +97,16 @@ namespace Prism.Windows
         public bool IsSuspending { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ILoggerFacade"/> for the application.
+        /// </summary>
+        /// <value>A <see cref="ILoggerFacade"/> instance.</value>
+        protected ILoggerFacade Logger { get; set; }
+
+        /// <summary>
         /// Override this method with logic that will be performed after the application is initialized. For example, navigating to the application's home page.
         /// </summary>
         /// <param name="args">The <see cref="LaunchActivatedEventArgs"/> instance containing the event data.</param>
-        protected abstract Task OnLaunchApplicationAsync(LaunchActivatedEventArgs args);
+        protected abstract void OnLaunchApplication(LaunchActivatedEventArgs args);
 
         /// <summary>
         /// Gets the type of the page based on a page token.
@@ -102,7 +127,7 @@ namespace Prism.Windows
                 var resourceLoader = ResourceLoader.GetForCurrentView(Constants.InfrastructureResourceMapId);
                 throw new ArgumentException(
                     string.Format(CultureInfo.InvariantCulture, resourceLoader.GetString("DefaultPageTypeLookupErrorMessage"), pageToken, this.GetType().Namespace + ".Views"),
-                    "pageToken");
+nameof(pageToken));
             }
 
             return viewType;
@@ -117,20 +142,14 @@ namespace Prism.Windows
         /// Override this method with the initialization logic of your application. Here you can initialize services, repositories, and so on.
         /// </summary>
         /// <param name="args">The <see cref="IActivatedEventArgs"/> instance containing the event data.</param>
-        protected virtual Task OnInitializeAsync(IActivatedEventArgs args)
-        {
-            return Task.FromResult<object>(null);
-        }
+        protected virtual void OnInitialize(IActivatedEventArgs args) { }
 
         /// <summary>
         /// Resolves the specified type.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>A concrete instance of the specified type.</returns>
-        protected virtual object Resolve(Type type)
-        {
-            return Activator.CreateInstance(type);
-        }
+        protected virtual object Resolve(Type type) => Activator.CreateInstance(type);
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user. Other entry points
@@ -138,11 +157,11 @@ namespace Prism.Windows
         /// search results, and so forth.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             if (Window.Current.Content == null)
             {
-                Frame rootFrame = await InitializeFrameAsync(args);
+                Frame rootFrame = InitializeFrame(args);
 
                 Shell = CreateShell(rootFrame);
 
@@ -159,7 +178,7 @@ namespace Prism.Windows
 
             if (Window.Current.Content != null && (!_isRestoringFromTermination || (args != null && args.TileId != tileId)))
             {
-                await OnLaunchApplicationAsync(args);
+                OnLaunchApplication(args);
             }
 
             // Ensure the current window is active
@@ -171,7 +190,7 @@ namespace Prism.Windows
         /// </summary>
         /// <param name="args">The <see cref="IActivatedEventArgs"/> instance containing the event data.</param>
         /// <returns>A task of a Frame that holds the app content.</returns>
-        protected async Task<Frame> InitializeFrameAsync(IActivatedEventArgs args)
+        protected Frame InitializeFrame(IActivatedEventArgs args)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
             var rootFrame = new Frame();
@@ -202,16 +221,24 @@ namespace Prism.Windows
             DeviceGestureService.GoBackRequested += OnGoBackRequested;
             DeviceGestureService.GoForwardRequested += OnGoForwardRequested;
 
+#if WINDOWS_APP
+            global::Windows.UI.ApplicationSettings.SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+#endif
+
+#if WINDOWS_PHONE_APP
+            global::Windows.Phone.UI.Input.HardwareButtons.BackPressed += OnHardwareButtonsBackPressed;
+#endif
+
             // Set a factory for the ViewModelLocator to use the default resolution mechanism to construct view models
             ViewModelLocationProvider.SetDefaultViewModelFactory(Resolve);
 
             OnRegisterKnownTypesForSerialization();
             if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
             {
-                await SessionStateService.RestoreSessionStateAsync();
+                SessionStateService.RestoreSessionStateAsync().Wait();
             }
 
-            await OnInitializeAsync(args);
+            OnInitialize(args);
 
             if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
             {
@@ -224,6 +251,7 @@ namespace Prism.Windows
                 }
                 catch (SessionStateServiceException)
                 {
+                    Logger.Log("Unable to restore session state.", Category.Exception, Priority.None);
                     // Something went wrong restoring state.
                     // Assume there is no state and continue
                 }
@@ -233,7 +261,7 @@ namespace Prism.Windows
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -247,7 +275,7 @@ namespace Prism.Windows
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -265,19 +293,21 @@ namespace Prism.Windows
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected virtual void OnNavigated(object sender, NavigationEventArgs e)
         {
+#if WINDOWS_UWP
             if (DeviceGestureService.UseTitleBarBackButton)
                 SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
                     NavigationService.CanGoBack() ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+#endif
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         protected virtual IDeviceGestureService CreateDeviceGestureService()
@@ -305,10 +335,7 @@ namespace Prism.Windows
         /// </summary>
         /// <param name="rootFrame"></param>
         /// <returns>The shell of the app.</returns>
-        protected virtual UIElement CreateShell(Frame rootFrame)
-        {
-            return rootFrame;
-        }
+        protected virtual UIElement CreateShell(Frame rootFrame) => rootFrame;
 
         /// <summary>
         /// Invoked when application execution is being suspended. Application state is saved
@@ -337,5 +364,45 @@ namespace Prism.Windows
                 IsSuspending = false;
             }
         }
+#if WINDOWS_APP
+        /// <summary>
+        /// Gets the Settings charm action items.
+        /// </summary>
+        /// <returns>The list of Setting charm action items that will populate the Settings pane.</returns>
+        protected abstract IList<global::Windows.UI.ApplicationSettings.SettingsCommand> GetSettingsCommands();
+#endif
+#if WINDOWS_PHONE_APP
+        protected virtual void OnHardwareButtonsBackPressed(object sender, global::Windows.Phone.UI.Input.BackPressedEventArgs e)
+        {
+            if (NavigationService.CanGoBack())
+            {
+                NavigationService.GoBack();
+                e.Handled = true;
+            }
+            else this.Exit();
+        }
+#endif
+#if WINDOWS_APP
+        /// <summary>
+        /// Called when the Settings charm is invoked, this handler populates the Settings charm with the charm items returned by the GetSettingsCommands function.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The <see cref="SettingsPaneCommandsRequestedEventArgs"/> instance containing the event data.</param>
+        private void OnCommandsRequested(global::Windows.UI.ApplicationSettings.SettingsPane sender, global::Windows.UI.ApplicationSettings.SettingsPaneCommandsRequestedEventArgs args)
+        {
+            if (args == null || args.Request == null || args.Request.ApplicationCommands == null)
+            {
+                return;
+            }
+
+            var applicationCommands = args.Request.ApplicationCommands;
+            var settingsCommands = GetSettingsCommands();
+
+            foreach (var settingsCommand in settingsCommands)
+            {
+                applicationCommands.Add(settingsCommand);
+            }
+        }
+#endif
     }
 }

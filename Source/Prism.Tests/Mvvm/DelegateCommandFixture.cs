@@ -1,10 +1,10 @@
+using Prism.Commands;
+using Prism.Mvvm;
+using Prism.Tests.Mocks.Commands;
 using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xunit;
-using Prism.Commands;
-using System.Threading.Tasks;
-using Prism.Tests.Mocks.Commands;
-using Prism.Mvvm;
 
 namespace Prism.Tests.Mvvm
 {
@@ -47,13 +47,13 @@ namespace Prism.Tests.Mvvm
         }
 
         [Fact]
-        public async Task ExecuteCallsPassedInExecuteDelegate()
+        public void ExecuteCallsPassedInExecuteDelegate()
         {
             var handlers = new DelegateHandlers();
             var command = new DelegateCommand<object>(handlers.Execute);
             object parameter = new object();
 
-            await command.Execute(parameter);
+            command.Execute(parameter);
 
             Assert.Same(parameter, handlers.ExecuteParameter);
         }
@@ -82,7 +82,6 @@ namespace Prism.Tests.Mvvm
 
             Assert.Equal(true, retVal);
         }
-
 
         [Fact]
         public void RaiseCanExecuteChangedRaisesCanExecuteChanged()
@@ -118,7 +117,7 @@ namespace Prism.Tests.Mvvm
         {
             bool executeCalled = false;
             MyClass testClass = new MyClass();
-            ICommand command = new DelegateCommand<MyClass>(delegate(MyClass parameter)
+            ICommand command = new DelegateCommand<MyClass>(delegate (MyClass parameter)
             {
                 Assert.Same(testClass, parameter);
                 executeCalled = true;
@@ -133,7 +132,7 @@ namespace Prism.Tests.Mvvm
         {
             bool canExecuteCalled = false;
             MyClass testClass = new MyClass();
-            ICommand command = new DelegateCommand<MyClass>((p) => { }, delegate(MyClass parameter)
+            ICommand command = new DelegateCommand<MyClass>((p) => { }, delegate (MyClass parameter)
             {
                 Assert.Same(testClass, parameter);
                 canExecuteCalled = true;
@@ -202,7 +201,7 @@ namespace Prism.Tests.Mvvm
         public void NonGenericDelegateCommandShouldInvokeExplicitExecuteFunc()
         {
             bool executed = false;
-            ICommand command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { executed = true; }));
+            ICommand command = new DelegateCommand(() => { executed = true; });
             command.Execute(null);
             Assert.True(executed);
         }
@@ -226,11 +225,11 @@ namespace Prism.Tests.Mvvm
         }
 
         [Fact]
-        public async Task NonGenericDelegateCommandExecuteShouldInvokeExecuteAction()
+        public void NonGenericDelegateCommandExecuteShouldInvokeExecuteAction()
         {
             bool executed = false;
             var command = new DelegateCommand(() => { executed = true; });
-            await command.Execute();
+            command.Execute();
 
             Assert.True(executed);
         }
@@ -282,51 +281,11 @@ namespace Prism.Tests.Mvvm
         }
 
         [Fact]
-        public void GenericDelegateCommandFromAsyncHandlerWithExecuteFuncShouldNotBeNull()
-        {
-            var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => { }));
-            Assert.NotNull(command);
-        }
-
-        [Fact]
-        public void GenericDelegateCommandFromAsyncHandlerWithExecuteAndCanExecuteFuncShouldNotBeNull()
-        {
-            var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => { }), (o) => true);
-            Assert.NotNull(command);
-        }
-
-        [Fact]
-        public void GenericDelegateCommandFromAsyncHandlerCanExecuteShouldBeTrueByDefault()
-        {
-            var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => { }));
-            var canExecute = command.CanExecute(null);
-            Assert.True(canExecute);
-        }
-
-        [Fact]
-        public void GenericDelegateCommandFromAsyncHandlerWithNullExecuteFuncShouldThrow()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var command = DelegateCommand<object>.FromAsyncHandler(null);
-            });
-        }
-
-        [Fact]
-        public void GenericDelegateCommandFromAsyncHandlerWithNullCanExecuteFuncShouldThrow()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => { }), null);
-            });
-        }
-
-        [Fact]
         public void DelegateCommandBaseWithNullExecuteFuncShouldThrow()
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var command = DelegateCommandMock.FromAsyncHandler(null);
+                var command = new DelegateCommandMock(null);
             });
         }
 
@@ -335,78 +294,8 @@ namespace Prism.Tests.Mvvm
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => { }), null);
+                var command = new DelegateCommand<object>((o) => { }, null);
             });
-        }
-
-        [Fact]
-        public async Task GenericDelegateCommandFromAsyncHandlerExecuteShouldInvokeExecuteFunc()
-        {
-            bool executed = false;
-
-            var command = DelegateCommand<object>.FromAsyncHandler(async (o) => await Task.Run(() => executed = true));
-            await command.Execute(null);
-
-            Assert.True(executed);
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerWithExecuteFuncShouldNotBeNull()
-        {
-            var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { }));
-            Assert.NotNull(command);
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerCanExecuteShouldBeTrueByDefault()
-        {
-            var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { }));
-            var canExecute = command.CanExecute();
-            Assert.True(canExecute);
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerWithNullExecuteFuncShouldThrow()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var command = DelegateCommand.FromAsyncHandler(null);
-            });
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerWithExecuteAndCanExecuteFuncShouldNotBeNull()
-        {
-            var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { }), () => true);
-            Assert.NotNull(command);
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerWithNullCanExecuteFuncShouldThrow()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { }), null);
-            });
-        }
-
-        [Fact]
-        public async Task DelegateCommandFromAsyncHandlerExecuteShouldInvokeExecuteFunc()
-        {
-            bool executed = false;
-
-            var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => executed = true));
-            await command.Execute();
-
-            Assert.True(executed);
-        }
-
-        [Fact]
-        public void DelegateCommandFromAsyncHandlerCanExecuteShouldInvokeCanExecuteFunc()
-        {
-            var command = DelegateCommand.FromAsyncHandler(async () => await Task.Run(() => { }), () => true);
-            var canExecute = command.CanExecute();
-            Assert.True(canExecute);
         }
 
         [Fact]
@@ -503,7 +392,6 @@ namespace Prism.Tests.Mvvm
                 DelegateCommand command = new DelegateCommand(() => { }).ObservesProperty(() => IntProperty).ObservesProperty(() => IntProperty);
             });
         }
-
 
         [Fact]
         public void GenericDelegateCommandShouldObserveCanExecute()
@@ -603,6 +491,7 @@ namespace Prism.Tests.Mvvm
         }
 
         private bool _boolProperty;
+
         public bool BoolProperty
         {
             get { return _boolProperty; }
@@ -610,15 +499,17 @@ namespace Prism.Tests.Mvvm
         }
 
         private int _intProperty;
+
         public int IntProperty
         {
             get { return _intProperty; }
             set { SetProperty(ref _intProperty, value); }
         }
 
-        class CanExecutChangeHandler
+        private class CanExecutChangeHandler
         {
             public bool CanExeucteChangedHandlerCalled;
+
             public void CanExecuteChangeHandler(object sender, EventArgs e)
             {
                 CanExeucteChangedHandlerCalled = true;
@@ -628,8 +519,7 @@ namespace Prism.Tests.Mvvm
         public void DoNothing(object param)
         { }
 
-
-        class DelegateHandlers
+        private class DelegateHandlers
         {
             public bool CanExecuteReturnValue = true;
             public object CanExecuteParameter;

@@ -20,7 +20,7 @@ namespace Prism.Commands
         readonly HashSet<string> _propertiesToObserve = new HashSet<string>();
         private INotifyPropertyChanged _inpc;
 
-        protected readonly Func<object, Task> _executeMethod;
+        protected readonly Action<object> _executeMethod;
         protected Func<object, bool> _canExecuteMethod;
 
         /// <summary>
@@ -30,22 +30,10 @@ namespace Prism.Commands
         /// <param name="canExecuteMethod">The <see cref="Func{Object,Bool}"/> to invoked when <see cref="ICommand.CanExecute"/> is invoked.</param>
         protected DelegateCommandBase(Action<object> executeMethod, Func<object, bool> canExecuteMethod)
         {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
-
-            _executeMethod = (arg) => { executeMethod(arg); return Task.Delay(0); };
-            _canExecuteMethod = canExecuteMethod;
-        }
-
-        /// <summary>
-        /// Creates a new instance of a <see cref="DelegateCommandBase"/>, specifying both the Execute action as an awaitable Task and the CanExecute function.
-        /// </summary>
-        /// <param name="executeMethod">The <see cref="Func{Object,Task}"/> to execute when <see cref="ICommand.Execute"/> is invoked.</param>
-        /// <param name="canExecuteMethod">The <see cref="Func{Object,Bool}"/> to invoked when <see cref="ICommand.CanExecute"/> is invoked.</param>
-        protected DelegateCommandBase(Func<object, Task> executeMethod, Func<object, bool> canExecuteMethod)
-        {
-            if (executeMethod == null || canExecuteMethod == null)
-                throw new ArgumentNullException("executeMethod", Resources.DelegateCommandDelegatesCannotBeNull);
+            if (executeMethod == null)
+                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
+            if (canExecuteMethod == null)
+                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
 
             _executeMethod = executeMethod;
             _canExecuteMethod = canExecuteMethod;
@@ -57,7 +45,7 @@ namespace Prism.Commands
         public virtual event EventHandler CanExecuteChanged;
 
         /// <summary>
-        /// Raises <see cref="ICommand.CanExecuteChanged"/> on the UI thread so every 
+        /// Raises <see cref="ICommand.CanExecuteChanged"/> on the UI thread so every
         /// command invoker can requery <see cref="ICommand.CanExecute"/>.
         /// </summary>
         protected virtual void OnCanExecuteChanged()
@@ -80,9 +68,9 @@ namespace Prism.Commands
             OnCanExecuteChanged();
         }
 
-        async void ICommand.Execute(object parameter)
+        void ICommand.Execute(object parameter)
         {
-            await Execute(parameter);
+            Execute(parameter);
         }
 
         bool ICommand.CanExecute(object parameter)
@@ -94,20 +82,14 @@ namespace Prism.Commands
         /// Executes the command with the provided parameter by invoking the <see cref="Action{Object}"/> supplied during construction.
         /// </summary>
         /// <param name="parameter"></param>
-        protected async Task Execute(object parameter)
-        {
-            await _executeMethod(parameter);
-        }
+        protected void Execute(object parameter) => _executeMethod(parameter);
 
         /// <summary>
         /// Determines if the command can execute with the provided parameter by invoking the <see cref="Func{Object,Bool}"/> supplied during construction.
         /// </summary>
         /// <param name="parameter">The parameter to use when determining if this command can execute.</param>
         /// <returns>Returns <see langword="true"/> if the command can execute.  <see langword="False"/> otherwise.</returns>
-        protected bool CanExecute(object parameter)
-        {
-            return _canExecuteMethod(parameter);
-        }
+        protected bool CanExecute(object parameter) => _canExecuteMethod(parameter);
 
         /// <summary>
         /// Observes a property that implements INotifyPropertyChanged, and automatically calls DelegateCommandBase.RaiseCanExecuteChanged on property changed notifications.

@@ -54,7 +54,7 @@ namespace Prism.Windows.Navigation
             {
                 var resourceLoader = ResourceLoader.GetForCurrentView(Constants.InfrastructureResourceMapId);
                 var error = string.Format(CultureInfo.CurrentCulture, resourceLoader.GetString("FrameNavigationServiceUnableResolveMessage"), pageToken);
-                throw new ArgumentException(error, "pageToken");
+                throw new ArgumentException(error, nameof(pageToken));
             }
 
             // Get the page type and parameter of the last navigation to check if we

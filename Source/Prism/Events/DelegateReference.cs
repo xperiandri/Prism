@@ -1,6 +1,3 @@
-
-
-
 using System;
 using System.Reflection;
 
@@ -27,7 +24,7 @@ namespace Prism.Events
         public DelegateReference(Delegate @delegate, bool keepReferenceAlive)
         {
             if (@delegate == null)
-                throw new ArgumentNullException("delegate");
+                throw new ArgumentNullException(nameof(@delegate));
 
             if (keepReferenceAlive)
             {
