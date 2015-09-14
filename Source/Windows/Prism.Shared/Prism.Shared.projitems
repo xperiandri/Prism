@@ -31,9 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Navigation\NavigatingFromEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PrismApplication.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Validation\BindableValidator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Validation\IValidatableBindableBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Validation\ValidatableBindableBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en-US\Resources.resw" />

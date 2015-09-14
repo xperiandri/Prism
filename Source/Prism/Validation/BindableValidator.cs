@@ -1,3 +1,4 @@
+using Prism.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using Windows.ApplicationModel.Resources;
+using System.Resources;
 
 namespace Prism.Windows.Validation
 {
@@ -26,20 +27,6 @@ namespace Prism.Windows.Validation
         /// </summary>
         public static readonly ReadOnlyCollection<string> EmptyErrorsCollection = new ReadOnlyCollection<string>(new List<string>());
 
-        private Func<string, string, string> _getResourceDelegate;
-
-        /// <summary>
-        /// Initializes a new instance of the BindableValidator class with the entity to validate.
-        /// </summary>
-        /// <param name="entityToValidate">The entity to validate</param>
-        /// <param name="getResourceDelegate">A delegate that returns a string resource given a resource map Id and resource Id</param>
-        /// <exception cref="ArgumentNullException">When <paramref name="entityToValidate"/> is <see langword="null" />.</exception>
-        public BindableValidator(INotifyPropertyChanged entityToValidate, Func<string, string, string> getResourceDelegate)
-            : this(entityToValidate)
-        {
-            _getResourceDelegate = getResourceDelegate;
-        }
-
         /// <summary>
         /// Initializes a new instance of the BindableValidator class with the entity to validate.
         /// </summary>
@@ -54,11 +41,6 @@ namespace Prism.Windows.Validation
 
             _entityToValidate = entityToValidate;
             IsValidationEnabled = true;
-            _getResourceDelegate = (mapId, key) =>
-            {
-                var resourceLoader = ResourceLoader.GetForCurrentView(mapId);
-                return resourceLoader.GetString(key);
-            };
         }
 
         /// <summary>
@@ -80,7 +62,11 @@ namespace Prism.Windows.Validation
         {
             get
             {
-                return _errors.ContainsKey(propertyName) ? _errors[propertyName] : EmptyErrorsCollection;
+                ReadOnlyCollection<string> errors;
+                if (_errors.TryGetValue(propertyName, out errors))
+                    return errors;
+                else
+                    return EmptyErrorsCollection;
             }
         }
 
@@ -90,10 +76,7 @@ namespace Prism.Windows.Validation
         /// <value>
         /// The dictionary of property names and errors collection pairs.
         /// </value>
-        public IDictionary<string, ReadOnlyCollection<string>> Errors
-        {
-            get { return _errors; }
-        }
+        public IDictionary<string, ReadOnlyCollection<string>> Errors => _errors;
 
         /// <summary>
         /// Returns true if the Validation functionality is enabled. Otherwise, false.
@@ -152,7 +135,7 @@ namespace Prism.Windows.Validation
             var propertyInfo = _entityToValidate.GetType().GetRuntimeProperty(propertyName);
             if (propertyInfo == null)
             {
-                var errorString = _getResourceDelegate(Constants.InfrastructureResourceMapId, "InvalidPropertyNameException");
+                var errorString = Resources.InvalidPropertyNameException;
 
                 throw new ArgumentException(errorString, propertyName);
             }

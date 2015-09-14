@@ -49,15 +49,6 @@
     <Compile Include="AppModel\DeviceGestureService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Portable.DataAnnotations, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Portable.DataAnnotations.1.0.0\lib\portable-net45+netcore45+wpa81\Portable.DataAnnotations.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="..\Prism.Shared\Prism.Shared.projitems" Label="Shared" />
