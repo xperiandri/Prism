@@ -115,7 +115,7 @@ namespace Prism.Windows.AppModel
         /// <param name="args"></param>
         protected virtual void OnMouseMoved(MouseDevice sender, MouseEventArgs args)
         {
-            RaiseEvent<MouseEventArgs>(MouseMoved, this, args);
+            RaiseEvent(MouseMoved, this, args);
         }
 
         /// <summary>
@@ -145,19 +145,19 @@ namespace Prism.Windows.AppModel
                 {
                     // When the previous key or Alt+Left are pressed navigate back
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
                 }
                 else if (virtualKey == VirtualKey.Back && winKey)
                 {
                     // When Win+Backspace is pressed navigate back
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
                 }
                 else if (((int)virtualKey == 167 && noModifiers) || (virtualKey == VirtualKey.Right && onlyAlt))
                 {
                     // When the next key or Alt+Right are pressed navigate forward
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoForwardRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoForwardRequested, this, new DeviceGestureEventArgs());
                 }
             }
         }
@@ -185,10 +185,10 @@ namespace Prism.Windows.AppModel
                 args.Handled = true;
 
                 if (backPressed)
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
 
                 if (forwardPressed)
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoForwardRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoForwardRequested, this, new DeviceGestureEventArgs());
             }
         }
     }

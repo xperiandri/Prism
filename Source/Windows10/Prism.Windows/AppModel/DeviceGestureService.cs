@@ -47,12 +47,12 @@ namespace Prism.Windows.AppModel
             Window.Current.CoreWindow.PointerPressed += OnPointerPressed;
         }
 
-        public bool IsHardwareBackButtonPresent { get; private set; }
-        public bool IsHardwareCameraButtonPresent { get; private set; }
+        public bool IsHardwareBackButtonPresent { get; }
+        public bool IsHardwareCameraButtonPresent { get; }
 
-        public bool IsKeyboardPresent { get; private set; }
-        public bool IsMousePresent { get; private set; }
-        public bool IsTouchPresent { get; private set; }
+        public bool IsKeyboardPresent { get; }
+        public bool IsMousePresent { get; }
+        public bool IsTouchPresent { get; }
 
         public bool UseTitleBarBackButton { get; set; }
 
@@ -148,7 +148,7 @@ namespace Prism.Windows.AppModel
         {
             DeviceGestureEventArgs args = new DeviceGestureEventArgs();
 
-            RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, args);
+            RaiseCancelableEvent(GoBackRequested, this, args);
 
             e.Handled = args.Handled;
         }
@@ -162,7 +162,7 @@ namespace Prism.Windows.AppModel
         {
             DeviceGestureEventArgs args = new DeviceGestureEventArgs(false, true);
 
-            RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, args);
+            RaiseCancelableEvent(GoBackRequested, this, args);
 
             e.Handled = args.Handled;
         }
@@ -194,19 +194,19 @@ namespace Prism.Windows.AppModel
                 {
                     // When the previous key or Alt+Left are pressed navigate back
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
                 }
                 else if (virtualKey == VirtualKey.Back && winKey)
                 {
                     // When Win+Backspace is pressed navigate back
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
                 }
                 else if (((int)virtualKey == 167 && noModifiers) || (virtualKey == VirtualKey.Right && onlyAlt))
                 {
                     // When the next key or Alt+Right are pressed navigate forward
                     args.Handled = true;
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoForwardRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoForwardRequested, this, new DeviceGestureEventArgs());
                 }
             }
         }
@@ -234,10 +234,10 @@ namespace Prism.Windows.AppModel
                 args.Handled = true;
 
                 if (backPressed)
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoBackRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoBackRequested, this, new DeviceGestureEventArgs());
 
                 if (forwardPressed)
-                    RaiseCancelableEvent<DeviceGestureEventArgs>(GoForwardRequested, this, new DeviceGestureEventArgs());
+                    RaiseCancelableEvent(GoForwardRequested, this, new DeviceGestureEventArgs());
             }
         }
 
@@ -248,7 +248,7 @@ namespace Prism.Windows.AppModel
         /// <param name="e"></param>
         protected virtual void OnHardwareButtonCameraHalfPressed(object sender, CameraEventArgs e)
         {
-            RaiseEvent<DeviceGestureEventArgs>(CameraButtonHalfPressed, this, new DeviceGestureEventArgs(false, true));
+            RaiseEvent(CameraButtonHalfPressed, this, new DeviceGestureEventArgs(false, true));
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace Prism.Windows.AppModel
         /// <param name="e"></param>
         protected virtual void OnHardwareButtonCameraPressed(object sender, CameraEventArgs e)
         {
-            RaiseEvent<DeviceGestureEventArgs>(CameraButtonPressed, this, new DeviceGestureEventArgs(false, true));
+            RaiseEvent(CameraButtonPressed, this, new DeviceGestureEventArgs(false, true));
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Prism.Windows.AppModel
         /// <param name="e"></param>
         protected virtual void OnHardwareButtonCameraReleased(object sender, CameraEventArgs e)
         {
-            RaiseEvent<DeviceGestureEventArgs>(CameraButtonReleased, this, new DeviceGestureEventArgs(false, true));
+            RaiseEvent(CameraButtonReleased, this, new DeviceGestureEventArgs(false, true));
         }
     }
 }
