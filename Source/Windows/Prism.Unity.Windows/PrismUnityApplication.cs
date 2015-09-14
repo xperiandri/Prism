@@ -75,10 +75,7 @@ namespace Prism.Unity.Windows
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>A concrete instance of the specified type.</returns>
-        protected override sealed object Resolve(Type type)
-        {
-            return Container.Resolve(type);
-        }
+        protected override sealed object Resolve(Type type) => Container.Resolve(type);
 
         #endregion Overrides
 
@@ -90,19 +87,13 @@ namespace Prism.Unity.Windows
         /// <remarks>
         /// The base implementation returns a new DebugLogger.
         /// </remarks>
-        protected virtual ILoggerFacade CreateLogger()
-        {
-            return new DebugLogger();
-        }
+        protected virtual ILoggerFacade CreateLogger() => new DebugLogger();
 
         /// <summary>
         /// Creates the <see cref="IUnityContainer"/> that will be used as the default container.
         /// </summary>
         /// <returns>A new instance of <see cref="IUnityContainer"/>.</returns>
-        protected virtual IUnityContainer CreateContainer()
-        {
-            return new UnityContainer();
-        }
+        protected virtual IUnityContainer CreateContainer() => new UnityContainer();
 
         /// <summary>
         /// Configures the <see cref="ViewModelLocator"/> used by Prism.
@@ -155,7 +146,7 @@ namespace Prism.Unity.Windows
             if (Container.IsTypeRegistered(fromType))
             {
                 Logger.Log(
-                    String.Format(CultureInfo.CurrentCulture,
+                    string.Format(CultureInfo.CurrentCulture,
                                   "Type {0} already registered with container",
                                   fromType.Name), Category.Debug, Priority.Low);
             }

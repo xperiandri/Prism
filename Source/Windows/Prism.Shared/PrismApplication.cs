@@ -152,6 +152,11 @@ nameof(pageToken));
         protected virtual object Resolve(Type type) => Activator.CreateInstance(type);
 
         /// <summary>
+        /// Gets a cache size of root frame.
+        /// </summary>
+        protected virtual int RootFrameCacheSize => 1;
+
+        /// <summary>
         /// Invoked when the application is launched normally by the end user. Other entry points
         /// will be used when the application is launched to open a specific file, to display
         /// search results, and so forth.
@@ -176,7 +181,7 @@ nameof(pageToken));
             // See http://go.microsoft.com/fwlink/?LinkID=288842
             string tileId = AppManifestHelper.GetApplicationId();
 
-            if (Window.Current.Content != null && (!_isRestoringFromTermination || (args != null && args.TileId != tileId)))
+            if (Window.Current.Content != null && (!_isRestoringFromTermination || args?.TileId != tileId))
             {
                 OnLaunchApplication(args);
             }
@@ -193,7 +198,7 @@ nameof(pageToken));
         protected Frame InitializeFrame(IActivatedEventArgs args)
         {
             // Create a Frame to act as the navigation context and navigate to the first page
-            var rootFrame = new Frame();
+            var rootFrame = new Frame() { CacheSize = RootFrameCacheSize };
 
             if (ExtendedSplashScreenFactory != null)
             {
@@ -223,10 +228,6 @@ nameof(pageToken));
 
 #if WINDOWS_APP
             global::Windows.UI.ApplicationSettings.SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
-#endif
-
-#if WINDOWS_PHONE_APP
-            global::Windows.Phone.UI.Input.HardwareButtons.BackPressed += OnHardwareButtonsBackPressed;
 #endif
 
             // Set a factory for the ViewModelLocator to use the default resolution mechanism to construct view models
@@ -369,20 +370,8 @@ nameof(pageToken));
         /// Gets the Settings charm action items.
         /// </summary>
         /// <returns>The list of Setting charm action items that will populate the Settings pane.</returns>
-        protected abstract IList<global::Windows.UI.ApplicationSettings.SettingsCommand> GetSettingsCommands();
-#endif
-#if WINDOWS_PHONE_APP
-        protected virtual void OnHardwareButtonsBackPressed(object sender, global::Windows.Phone.UI.Input.BackPressedEventArgs e)
-        {
-            if (NavigationService.CanGoBack())
-            {
-                NavigationService.GoBack();
-                e.Handled = true;
-            }
-            else this.Exit();
-        }
-#endif
-#if WINDOWS_APP
+        protected abstract IEnumerable<global::Windows.UI.ApplicationSettings.SettingsCommand> GetSettingsCommands();
+
         /// <summary>
         /// Called when the Settings charm is invoked, this handler populates the Settings charm with the charm items returned by the GetSettingsCommands function.
         /// </summary>

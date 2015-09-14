@@ -57,12 +57,13 @@ namespace Prism.Windows.Navigation
                 throw new ArgumentException(error, nameof(pageToken));
             }
 
-            // Get the page type and parameter of the last navigation to check if we
-            // are trying to navigate to the exact same page that we are currently on
-            var lastNavigationParameter = _sessionStateService.SessionState.ContainsKey(LastNavigationParameterKey) ? _sessionStateService.SessionState[LastNavigationParameterKey] : null;
-            var lastPageTypeFullName = _sessionStateService.SessionState.ContainsKey(LastNavigationPageKey) ? _sessionStateService.SessionState[LastNavigationPageKey] as string : string.Empty;
+            object lastNavigationParameter;
+            _sessionStateService.SessionState.TryGetValue(LastNavigationParameterKey, out lastNavigationParameter);
+            object lastPageTypeFullName;
+            if (!_sessionStateService.SessionState.TryGetValue(LastNavigationPageKey, out lastPageTypeFullName))
+                lastPageTypeFullName = string.Empty;
 
-            if (lastPageTypeFullName != pageType.FullName || !AreEquals(lastNavigationParameter, parameter))
+            if ((string)lastPageTypeFullName != pageType.FullName || !AreEquals(lastNavigationParameter, parameter))
             {
                 return _frame.Navigate(pageType, parameter);
             }
