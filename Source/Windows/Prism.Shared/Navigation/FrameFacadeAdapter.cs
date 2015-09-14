@@ -23,6 +23,42 @@ namespace Prism.Windows.Navigation
         public FrameFacadeAdapter(Frame frame)
         {
             _frame = frame;
+#if WINDOWS_PHONE_APP
+            if (frame.Content == null)
+            {
+                // Removes the turnstile navigation for startup.
+                if (frame.ContentTransitions != null)
+                {
+                    this.transitions = new global::Windows.UI.Xaml.Media.Animation.TransitionCollection();
+                    foreach (var c in frame.ContentTransitions)
+                    {
+                        this.transitions.Add(c);
+                    }
+                }
+
+                frame.ContentTransitions = null;
+                frame.Navigated += this.RootFrame_FirstNavigated;
+            }
+        }
+
+        private global::Windows.UI.Xaml.Media.Animation.TransitionCollection transitions;
+
+        /// <summary>
+        /// Restores the content transitions after the app has launched.
+        /// </summary>
+        /// <param name="sender">The object where the handler is attached.</param>
+        /// <param name="e">Details about the navigation event.</param>
+        private void RootFrame_FirstNavigated(object sender, NavigationEventArgs e)
+        {
+            var rootFrame = sender as Frame;
+            rootFrame.ContentTransitions = this.transitions ??
+                new global::Windows.UI.Xaml.Media.Animation.TransitionCollection()
+                {
+                    new global::Windows.UI.Xaml.Media.Animation.NavigationThemeTransition()
+                };
+            rootFrame.Navigated -= this.RootFrame_FirstNavigated;
+            transitions = null;
+#endif
         }
 
         /// <summary>
