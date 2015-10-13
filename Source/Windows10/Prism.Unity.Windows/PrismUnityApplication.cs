@@ -23,13 +23,16 @@ namespace Prism.Unity.Windows
     {
         #region Constructor
 
-        public PrismUnityApplication()
+        protected PrismUnityApplication() : this(new DebugLogger(), new UnityContainer())
         {
-            Container = CreateContainer();
-            if (Container == null)
-            {
+        }
+
+        protected PrismUnityApplication(ILoggerFacade logger, IUnityContainer container) : base(logger)
+        {
+            if (container == null)
                 throw new InvalidOperationException("Unity container is null");
-            }
+
+            Container = container;
         }
 
         #endregion Constructor
@@ -54,7 +57,7 @@ namespace Prism.Unity.Windows
         /// Implements and seals the OnInitialize method to configure the container.
         /// </summary>
         /// <param name="args">The <see cref="IActivatedEventArgs"/> instance containing the event data.</param>
-        protected override void OnInitialize(IActivatedEventArgs args)
+        protected override sealed void OnInitialize(IActivatedEventArgs args)
         {
             ConfigureContainer();
             ConfigureViewModelLocator();
@@ -72,12 +75,6 @@ namespace Prism.Unity.Windows
         #endregion Overrides
 
         #region Protected Methods
-
-        /// <summary>
-        /// Creates the <see cref="IUnityContainer"/> that will be used as the default container.
-        /// </summary>
-        /// <returns>A new instance of <see cref="IUnityContainer"/>.</returns>
-        protected virtual IUnityContainer CreateContainer() => new UnityContainer();
 
         /// <summary>
         /// Configures the <see cref="ViewModelLocator"/> used by Prism.

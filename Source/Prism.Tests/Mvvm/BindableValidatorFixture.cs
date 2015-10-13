@@ -1,5 +1,5 @@
+using Prism.Validation;
 using Prism.Windows.Tests.Mocks;
-using Prism.Windows.Validation;
 using System;
 using Xunit;
 

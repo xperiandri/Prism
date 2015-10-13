@@ -23,21 +23,16 @@ namespace Prism.Unity.Windows
     {
         #region Constructor
 
-        public PrismUnityApplication()
+        protected PrismUnityApplication() : this(new DebugLogger(), new UnityContainer())
         {
-            Logger = CreateLogger();
-            if (Logger == null)
-            {
-                throw new InvalidOperationException("Logger Facade is null");
-            }
+        }
 
-            Logger.Log("Created Logger", Category.Debug, Priority.Low);
-
-            Container = CreateContainer();
-            if (Container == null)
-            {
+        protected PrismUnityApplication(ILoggerFacade logger, IUnityContainer container) : base(logger)
+        {
+            if (container == null)
                 throw new InvalidOperationException("Unity container is null");
-            }
+
+            Container = container;
         }
 
         #endregion Constructor
@@ -80,20 +75,6 @@ namespace Prism.Unity.Windows
         #endregion Overrides
 
         #region Protected Methods
-
-        /// <summary>
-        /// Create the <see cref="ILoggerFacade" /> used by the bootstrapper.
-        /// </summary>
-        /// <remarks>
-        /// The base implementation returns a new DebugLogger.
-        /// </remarks>
-        protected virtual ILoggerFacade CreateLogger() => new DebugLogger();
-
-        /// <summary>
-        /// Creates the <see cref="IUnityContainer"/> that will be used as the default container.
-        /// </summary>
-        /// <returns>A new instance of <see cref="IUnityContainer"/>.</returns>
-        protected virtual IUnityContainer CreateContainer() => new UnityContainer();
 
         /// <summary>
         /// Configures the <see cref="ViewModelLocator"/> used by Prism.
