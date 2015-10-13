@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Prism.Windows.Validation
+namespace Prism.Validation
 {
     /// <summary>
     /// The IValidatableBindableBase interface was created to add validation support for model classes that contain validation rules.

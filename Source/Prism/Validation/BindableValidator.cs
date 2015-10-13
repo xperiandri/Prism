@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 
-namespace Prism.Windows.Validation
+namespace Prism.Validation
 {
     /// <summary>
     /// The BindableValidator class run validation rules of an entity, and stores a collection of errors of the properties that did not pass validation.
