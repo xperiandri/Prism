@@ -38,6 +38,8 @@ namespace Prism.Windows
         /// <param name="logger">Logger</param>
         protected PrismApplication(ILoggerFacade logger)
         {
+            WindowsRuntimeResourceManager.InjectIntoResxGeneratedApplicationResourcesClass(typeof(Properties.Resources));
+
             Logger = logger;
             if (Logger == null)
             {
@@ -289,7 +291,8 @@ nameof(pageToken));
             }
             else if (DeviceGestureService.IsHardwareBackButtonPresent && e.IsHardwareButton)
             {
-                Exit();
+                // Looks like default behavior must be to do nothing
+                //Exit();
             }
         }
 
