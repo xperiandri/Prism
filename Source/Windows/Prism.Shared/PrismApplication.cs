@@ -40,7 +40,7 @@ namespace Prism.Windows
         {
             WindowsRuntimeResourceManager.InjectIntoResxGeneratedApplicationResourcesClass(typeof(Properties.Resources));
 
-            if (Logger == null)
+            if (logger == null)
                 throw new InvalidOperationException("Logger Facade is null");
 
             Logger = logger;

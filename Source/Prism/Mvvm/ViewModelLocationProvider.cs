@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -90,7 +88,7 @@ namespace Prism.Mvvm
             if (viewModel == null)
             {
                 var viewModelType = _defaultViewTypeToViewModelTypeResolver(view.GetType());
-                if (viewModelType == null) 
+                if (viewModelType == null)
                     return;
 
                 viewModel = _defaultViewModelFactoryWithViewParameter != null ? _defaultViewModelFactoryWithViewParameter(view, viewModelType) : _defaultViewModelFactory(viewModelType);
