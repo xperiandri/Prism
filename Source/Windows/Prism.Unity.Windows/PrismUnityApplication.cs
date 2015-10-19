@@ -8,6 +8,7 @@ using Prism.Windows.AppModel;
 using Prism.Windows.Navigation;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -81,7 +82,7 @@ namespace Prism.Unity.Windows
         /// </summary>
         protected virtual void ConfigureViewModelLocator()
         {
-            ViewModelLocationProvider.SetDefaultViewModelFactory((type) => Container.Resolve(type));
+            ViewModelLocationProvider.SetDefaultViewModelFactory(Resolve);
         }
 
         protected virtual void ConfigureContainer()
