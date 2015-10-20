@@ -51,11 +51,6 @@ namespace Prism.Commands
         public DelegateCommand(Action<T> executeMethod, Func<T, bool> canExecuteMethod)
             : base((o) => executeMethod((T)o), (o) => canExecuteMethod((T)o))
         {
-            if (executeMethod == null)
-                throw new ArgumentNullException(nameof(executeMethod), Resources.DelegateCommandDelegatesCannotBeNull);
-            if (canExecuteMethod == null)
-                throw new ArgumentNullException(nameof(canExecuteMethod), Resources.DelegateCommandDelegatesCannotBeNull);
-
             TypeInfo genericTypeInfo = typeof(T).GetTypeInfo();
 
             // DelegateCommand allows object or Nullable<>.
